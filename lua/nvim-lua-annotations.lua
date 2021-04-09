@@ -122,6 +122,19 @@ local function generate_nvim_options_annotations()
     return table.concat(annotations, '\n\n')
 end
 
+local function generate_shared_lua_annotations()
+    local annotations = {}
+    local file, open_err = io.open(vim.env.VIMRUNTIME .. '/lua/vim/shared.lua', 'r')
+    assert(not open_err, open_err)
+
+    for line in file:lines() do
+        local signature = line:match('^function vim%..*%)')
+        if signature then table.insert(annotations, signature .. ' end') end
+    end
+
+    return table.concat(annotations, '\n\n')
+end
+
 local function write_to_file(path)
     vim.validate {
         path = {path, 'string'},
@@ -132,13 +145,16 @@ local function write_to_file(path)
     end
     local api_annotations = generate_api_annotations()
     local nvim_options_annotations = generate_nvim_options_annotations()
+    local shared_lua_annotations = generate_shared_lua_annotations()
     local file, open_err = io.open(path, 'w+')
     assert(not open_err, open_err)
     local _, write_err file:write(
         vim_globals,
         api_annotations,
         '\n\n',
-        nvim_options_annotations
+        nvim_options_annotations,
+        '\n\n',
+        shared_lua_annotations
         )
     if write_err then
         file:close()
