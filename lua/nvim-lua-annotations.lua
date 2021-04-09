@@ -124,10 +124,8 @@ end
 
 local function generate_shared_lua_annotations()
     local annotations = {}
-    local file, open_err = io.open(vim.env.VIMRUNTIME .. '/lua/vim/shared.lua', 'r')
-    assert(not open_err, open_err)
 
-    for line in file:lines() do
+    for line in io.lines(vim.env.VIMRUNTIME .. '/lua/vim/shared.lua') do
         local signature = line:match('^function vim%..*%)')
         if signature then table.insert(annotations, signature .. ' end') end
     end
