@@ -2,7 +2,7 @@ local vim_globals = [[
 --- The vim global namespace. See `:help lua-vim`
 _G.vim = {}
 
---- The API namescape. See `:help api-global`
+--- The API namespace. See `:help api-global`
 _G.vim.api = {}
 
 --- Global vim options. See `:help lua-vim-options`
