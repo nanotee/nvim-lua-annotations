@@ -66,6 +66,44 @@ local function generate_api_annotations()
     return table.concat(annotations, '\n\n')
 end
 
+local option_scopes_map = {
+    global = 'o',
+    win = 'wo',
+    buf = 'bo',
+}
+
+local function format_type(type)
+    return ('--- @type %s'):format(type)
+end
+
+local function format_variable_name(scope, name)
+    return ('vim.%s.%s = nil'):format(scope, name)
+end
+
+local function make_option_annotation(type, scope, name)
+    local option_type = format_type(type)
+    local option_name = format_variable_name(option_scopes_map[scope], name)
+    local annotation = {option_type, option_name}
+    return table.concat(annotation, '\n')
+end
+
+local function generate_nvim_options_annotations()
+    local annotations = {}
+
+    for _, option in pairs(vim.api.nvim_get_all_options_info()) do
+        if option.name ~= '' then
+            local annotation = {}
+            table.insert(annotation, make_option_annotation(option.type, option.scope, option.name))
+            if option.global_local then
+                table.insert(annotation, make_option_annotation(option.type, 'global', option.name))
+            end
+            table.insert(annotations, table.concat(annotation, '\n'))
+        end
+    end
+
+    return table.concat(annotations, '\n\n')
+end
+
 local function write_to_file(path)
     vim.validate {
         path = {path, 'string'},
@@ -75,9 +113,10 @@ local function write_to_file(path)
         if not answer:match('^[yY][eE]?[sS]?$') then return end
     end
     local api_annotations = generate_api_annotations()
+    local nvim_options_annotations = generate_nvim_options_annotations()
     local file, open_err = io.open(path, 'w+')
     assert(not open_err, open_err)
-    local _, write_err file:write(api_annotations)
+    local _, write_err file:write(api_annotations, '\n\n', nvim_options_annotations)
     if write_err then
         file:close()
         error(write_err)
