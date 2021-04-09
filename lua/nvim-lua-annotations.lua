@@ -1,3 +1,21 @@
+local vim_globals = [[
+--- The vim global namespace. See `:help lua-vim`
+_G.vim = {}
+
+--- The API namescape. See `:help api-global`
+_G.vim.api = {}
+
+--- Global vim options. See `:help lua-vim-options`
+_G.vim.o = {}
+
+--- Window-local vim options. See `:help lua-vim-options`
+_G.vim.wo = {}
+
+--- Buffer-local vim options. See `:help lua-vim-options`
+_G.vim.bo = {}
+
+]]
+
 local api_types_map = {
     Object = 'any',
     Integer = 'integer',
@@ -116,7 +134,12 @@ local function write_to_file(path)
     local nvim_options_annotations = generate_nvim_options_annotations()
     local file, open_err = io.open(path, 'w+')
     assert(not open_err, open_err)
-    local _, write_err file:write(api_annotations, '\n\n', nvim_options_annotations)
+    local _, write_err file:write(
+        vim_globals,
+        api_annotations,
+        '\n\n',
+        nvim_options_annotations
+        )
     if write_err then
         file:close()
         error(write_err)
