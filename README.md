@@ -1,3 +1,5 @@
+(You should probably check [lua-dev.nvim](https://github.com/folke/lua-dev.nvim) out instead)
+
 # nvim-lua-annotations
 
 A quick and dirty script to generate EmmyLua annotations for Neovim functions/APIs. WIP.
